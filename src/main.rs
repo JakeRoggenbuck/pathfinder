@@ -54,6 +54,20 @@ impl Finder for Path {
     }
 }
 
+fn usage() {
+    println!(
+        "
+        Pathfinder -- 0.1
+        ----------------
+        Usage: pathfinder [OPTION]... [SEARCH]...
+        h, --help       Display this page and exit
+        v, --version    Display the version and exit
+        l, --list       List all locations in $PATH (same as find with no keyword)
+        f, --find       Find locations in $PATH including search keyword
+        "
+    );
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
@@ -68,8 +82,9 @@ fn main() {
 
             if args.len() >= 1 {
                 match args[1].as_ref() {
-                    "version" | "v" => println!("Version: 0.1"),
-                    "find" | "f" => {
+                    "--version" | "-v" | "v" => println!("Version: 0.1"),
+                    "--help" | "-h" | "h" => usage(),
+                    "--find" | "-f" | "f" => {
                         if args.len() >= 3 {
                             let loc = finder.find_locations(args[2].to_string());
                             finder.list(Some(loc));
@@ -77,6 +92,7 @@ fn main() {
                             finder.list(None);
                         }
                     }
+                    "--list" | "l" => finder.list(None),
                     _ => process::exit(0),
                 };
             }
