@@ -66,10 +66,21 @@ fn usage() {
         f, --find       Find locations in $PATH including search keyword
         "
     );
+    process::exit(0);
+}
+
+fn version() {
+    println!("Version: 0.1");
+    process::exit(0);
 }
 
 fn main() {
     let args: Vec<String> = env::args().collect();
+
+    if args.len() == 1 {
+        eprintln!("No command passed\nUse --help for more info");
+        process::exit(0);
+    }
 
     let path = env::var("PATH");
     match path {
@@ -82,7 +93,7 @@ fn main() {
 
             if args.len() >= 1 {
                 match args[1].as_ref() {
-                    "--version" | "-v" | "v" => println!("Version: 0.1"),
+                    "--version" | "-v" | "v" => version(),
                     "--help" | "-h" | "h" => usage(),
                     "--find" | "-f" | "f" => {
                         if args.len() >= 3 {
