@@ -74,6 +74,25 @@ fn version() {
     process::exit(0);
 }
 
+fn arg_parser(args: Vec<String>, finder: Path) {
+    if args.len() >= 1 {
+        match args[1].as_ref() {
+            "--version" | "-v" | "v" => version(),
+            "--help" | "-h" | "h" => usage(),
+            "--find" | "-f" | "f" => {
+                if args.len() >= 3 {
+                    let loc = finder.find_locations(args[2].to_string());
+                    finder.list(Some(loc));
+                } else {
+                    finder.list(None);
+                }
+            }
+            "--list" | "l" => finder.list(None),
+            _ => process::exit(0),
+        };
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
@@ -90,23 +109,7 @@ fn main() {
                 places: Vec::new(),
             };
             finder.split_path();
-
-            if args.len() >= 1 {
-                match args[1].as_ref() {
-                    "--version" | "-v" | "v" => version(),
-                    "--help" | "-h" | "h" => usage(),
-                    "--find" | "-f" | "f" => {
-                        if args.len() >= 3 {
-                            let loc = finder.find_locations(args[2].to_string());
-                            finder.list(Some(loc));
-                        } else {
-                            finder.list(None);
-                        }
-                    }
-                    "--list" | "l" => finder.list(None),
-                    _ => process::exit(0),
-                };
-            }
+            arg_parser(args, finder)
         }
         Err(e) => eprint!("{}", e),
     }
