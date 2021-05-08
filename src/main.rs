@@ -10,6 +10,7 @@ trait PathFinder {
     fn spawn(&self);
     fn add(&self, location: String);
     fn purge(&self);
+    fn search(&self, args: Vec<String>, enumerate: bool);
 }
 
 struct Finder {
@@ -29,10 +30,10 @@ impl PathFinder for Finder {
         self.places = vec;
     }
     fn list(&self, locations: Option<Vec<u8>>, enumerate: bool) {
+        let mut number: u8 = 0;
         match locations {
             Some(l) => {
                 let mut index: u8 = 0;
-                let mut number: u8 = 0;
                 for place in &self.places {
                     if l.contains(&index) {
                         if enumerate {
@@ -100,6 +101,14 @@ impl PathFinder for Finder {
         env::set_var("PATH", "UNSET");
         self.spawn();
     }
+    fn search(&self, args: Vec<String>, enumerate: bool) {
+        let phrase = if args.len() >= 3 {
+            Some(self.find_locations(args[2].to_string()))
+        } else {
+            None
+        };
+        self.list(phrase, enumerate);
+    }
 }
 
 fn usage() {
@@ -135,24 +144,10 @@ fn arg_parser(args: Vec<String>, finder: Finder) {
                     finder.add(args[2].to_owned());
                 }
             }
-            "--find" | "-f" | "f" => {
-                if args.len() >= 3 {
-                    let loc = finder.find_locations(args[2].to_string());
-                    finder.list(Some(loc), false);
-                } else {
-                    finder.list(None, false);
-                }
-            }
+            "--find" | "-f" | "f" => finder.search(args, false),
             "--list" | "l" => finder.list(None, false),
             "--purge" | "p" => finder.purge(),
-            "--number" | "-n" | "n" => {
-                if args.len() >= 3 {
-                    let loc = finder.find_locations(args[2].to_string());
-                    finder.list(Some(loc), true);
-                } else {
-                    finder.list(None, true);
-                }
-            }
+            "--number" | "-n" | "n" => finder.search(args, true),
             _ => process::exit(0),
         };
     }
