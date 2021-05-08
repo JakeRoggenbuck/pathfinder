@@ -7,6 +7,7 @@ trait PathFinder {
     fn split_path(&mut self);
     fn list(&self, locations: Option<Vec<u8>>);
     fn find_locations(&self, word: String) -> Vec<u8>;
+    fn spawn(&self);
     fn add(&self, location: String);
 }
 
@@ -55,6 +56,16 @@ impl PathFinder for Finder {
         }
         return locations;
     }
+    fn spawn(&self) {
+        // Open a new instance of bash on top of the program
+        Command::new("bash")
+            .spawn()
+            .expect("Failed to execute command");
+
+        // Wait for a long time to let the new bash prompt exist a while
+        let mut child = Command::new("sleep").arg("infinity").spawn().unwrap();
+        let _result = child.wait().unwrap();
+    }
     fn add(&self, location: String) {
         println!("Adding {} to $PATH", location);
         // Checks if the file location exists
@@ -65,15 +76,7 @@ impl PathFinder for Finder {
                 format!("{}:{}", location, env::var("PATH").unwrap()),
             );
 
-            // Open a new instance of bash on top of the program
-            Command::new("bash")
-                .spawn()
-                .expect("Failed to execute command");
-
-            // Wait for a long time to let the new bash prompt exist a while
-            let mut child = Command::new("sleep").arg("infinity").spawn().unwrap();
-            let _result = child.wait().unwrap();
-
+            self.spawn();
         } else {
             eprintln!("The location {}, does not exist", location);
         }
