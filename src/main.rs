@@ -11,6 +11,7 @@ trait PathFinder {
     fn add(&self, location: String);
     fn purge(&self);
     fn search(&self, args: Vec<String>, enumerate: bool);
+    fn enumerate_print(&self, number: &mut i32, literal: String, enumerate: bool);
 }
 
 struct Finder {
@@ -29,34 +30,30 @@ impl PathFinder for Finder {
         }
         self.places = vec;
     }
+    fn enumerate_print(&self, number: &mut i32, literal: String, enumerate: bool) {
+        if enumerate {
+            println!("{}\t{}", *number, literal);
+            *number += 1;
+        } else {
+            println!("{}", literal);
+            *number += 1;
+        }
+    }
     fn list(&self, locations: Option<Vec<u8>>, enumerate: bool) {
-        let mut number: u8 = 0;
+        let mut number: i32 = 0;
         match locations {
             Some(l) => {
                 let mut index: u8 = 0;
                 for place in &self.places {
                     if l.contains(&index) {
-                        if enumerate {
-                            println!("{}\t{}", number, place);
-                            number += 1;
-                        } else {
-                            println!("{}", place);
-                            number += 1;
-                        }
+                        self.enumerate_print(&mut number, place.to_string(), enumerate);
                     }
                     index += 1;
                 }
             }
             None => {
-                let mut number: u8 = 0;
                 for place in &self.places {
-                    if enumerate {
-                        println!("{}\t{}", number, place);
-                        number += 1;
-                    } else {
-                        println!("{}", place);
-                        number += 1;
-                    }
+                    self.enumerate_print(&mut number, place.to_string(), enumerate);
                 }
             }
         }
@@ -137,17 +134,17 @@ fn version() {
 fn arg_parser(args: Vec<String>, finder: Finder) {
     if args.len() >= 1 {
         match args[1].as_ref() {
-            "--version" | "-v" | "v" => version(),
-            "--help" | "-h" | "h" => usage(),
-            "--add" | "-a" | "a" => {
+            "--version" | "version" | "-v" | "v" => version(),
+            "--help" | "help" | "-h" | "h" => usage(),
+            "--add" | "add" | "-a" | "a" => {
                 if args.len() >= 3 {
                     finder.add(args[2].to_owned());
                 }
             }
-            "--find" | "-f" | "f" => finder.search(args, false),
-            "--list" | "-l" | "l" => finder.list(None, false),
-            "--purge" | "-p" | "p" => finder.purge(),
-            "--number" | "-n" | "n" => finder.search(args, true),
+            "--find" | "find" | "-f" | "f" => finder.search(args, false),
+            "--list" | "list" | "-l" | "l" => finder.list(None, false),
+            "--purge" | "purge" | "-p" | "p" => finder.purge(),
+            "--number" | "number" | "-n" | "n" => finder.search(args, true),
             _ => {
                 println!("Command {} not found", args[1]);
                 process::exit(0)
