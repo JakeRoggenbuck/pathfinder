@@ -1,18 +1,21 @@
 use std::env;
 use std::process;
+use std::path::Path;
+use std::process::Command;
 
-trait Finder {
+trait PathFinder {
     fn split_path(&mut self);
     fn list(&self, locations: Option<Vec<u8>>);
     fn find_locations(&self, word: String) -> Vec<u8>;
+    fn add(&self, location: String);
 }
 
-struct Path {
+struct Finder {
     path: String,
     places: Vec<String>,
 }
 
-impl Finder for Path {
+impl PathFinder for Finder {
     fn split_path(&mut self) {
         let split = self.path.split(":");
         let mut vec = Vec::<String>::new();
@@ -52,6 +55,17 @@ impl Finder for Path {
         }
         return locations;
     }
+    fn add(&self, location: String) {
+        println!("Adding {} to $PATH", location);
+        // Checks if the file location exists
+        if Path::new(&location).exists() {
+            env::set_var("PATH", format!("FOO:{}", env::var("PATH").unwrap()));
+            println!("{}", env::var("PATH").unwrap());
+            self.list(None);
+        } else {
+            eprintln!("The location {}, does not exist", location);
+        }
+    }
 }
 
 fn usage() {
@@ -74,11 +88,16 @@ fn version() {
     process::exit(0);
 }
 
-fn arg_parser(args: Vec<String>, finder: Path) {
+fn arg_parser(args: Vec<String>, finder: Finder) {
     if args.len() >= 1 {
         match args[1].as_ref() {
             "--version" | "-v" | "v" => version(),
             "--help" | "-h" | "h" => usage(),
+            "--add" | "-a" | "a" => {
+                if args.len() >= 3 {
+                    finder.add(args[2].to_owned());
+                }
+            },
             "--find" | "-f" | "f" => {
                 if args.len() >= 3 {
                     let loc = finder.find_locations(args[2].to_string());
@@ -104,7 +123,7 @@ fn main() {
     let path = env::var("PATH");
     match path {
         Ok(path) => {
-            let mut finder = Path {
+            let mut finder = Finder {
                 path: path,
                 places: Vec::new(),
             };
