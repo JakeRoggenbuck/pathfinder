@@ -1,5 +1,5 @@
 # pathfinder
-A simple utility to view and search your $PATH 
+A simple utility to view, edit, and search your $PATH
 
 ## Usage
 | Shorthand | Flag        | Description                                                |
