@@ -174,3 +174,30 @@ fn main() {
         Err(e) => eprint!("{}", e),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn split_path_test() {
+        let mut finder = Finder {
+            path: "/one/word:/two:/words".to_owned(),
+            places: Vec::new(),
+        };
+        finder.split_path();
+        assert_eq!(finder.places, vec!["/one/word", "/two", "/words"]);
+    }
+
+    #[test]
+    fn find_locations_test() {
+        let mut finder = Finder {
+            path: "this:that:/ya/know:/everything".to_owned(),
+            places: Vec::new(),
+        };
+        finder.split_path();
+        assert_eq!(finder.find_locations("a".to_owned()), vec![1, 2]);
+        assert_eq!(finder.find_locations("y".to_owned()), vec![2, 3]);
+        assert_eq!(finder.find_locations("t".to_owned()), vec![0, 1, 3]);
+    }
+}
