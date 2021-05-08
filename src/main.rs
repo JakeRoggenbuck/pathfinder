@@ -145,10 +145,13 @@ fn arg_parser(args: Vec<String>, finder: Finder) {
                 }
             }
             "--find" | "-f" | "f" => finder.search(args, false),
-            "--list" | "l" => finder.list(None, false),
-            "--purge" | "p" => finder.purge(),
+            "--list" | "-l" | "l" => finder.list(None, false),
+            "--purge" | "-p" | "p" => finder.purge(),
             "--number" | "-n" | "n" => finder.search(args, true),
-            _ => process::exit(0),
+            _ => {
+                println!("Command {} not found", args[1]);
+                process::exit(0)
+            }
         };
     }
 }
