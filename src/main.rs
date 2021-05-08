@@ -1,7 +1,7 @@
 use std::env;
-use std::process;
 use std::path::Path;
-use std::process::Command;
+use std::process;
+use std::process::{Command, Stdio};
 
 trait PathFinder {
     fn split_path(&mut self);
@@ -59,9 +59,21 @@ impl PathFinder for Finder {
         println!("Adding {} to $PATH", location);
         // Checks if the file location exists
         if Path::new(&location).exists() {
-            env::set_var("PATH", format!("FOO:{}", env::var("PATH").unwrap()));
-            println!("{}", env::var("PATH").unwrap());
-            self.list(None);
+            // Set the environmental variable, same as PATH=location:$PATH
+            env::set_var(
+                "PATH",
+                format!("{}:{}", location, env::var("PATH").unwrap()),
+            );
+
+            // Open a new instance of bash on top of the program
+            Command::new("bash")
+                .spawn()
+                .expect("Failed to execute command");
+
+            // Wait for a long time to let the new bash prompt exist a while
+            let mut child = Command::new("sleep").arg("infinity").spawn().unwrap();
+            let _result = child.wait().unwrap();
+
         } else {
             eprintln!("The location {}, does not exist", location);
         }
@@ -97,7 +109,7 @@ fn arg_parser(args: Vec<String>, finder: Finder) {
                 if args.len() >= 3 {
                     finder.add(args[2].to_owned());
                 }
-            },
+            }
             "--find" | "-f" | "f" => {
                 if args.len() >= 3 {
                     let loc = finder.find_locations(args[2].to_string());
