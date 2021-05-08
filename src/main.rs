@@ -32,26 +32,30 @@ impl PathFinder for Finder {
         match locations {
             Some(l) => {
                 let mut index: u8 = 0;
+                let mut number: u8 = 0;
                 for place in &self.places {
                     if l.contains(&index) {
                         if enumerate {
-                            println!("{}\t{}", index, place);
+                            println!("{}\t{}", number, place);
+                            number += 1;
                         } else {
                             println!("{}", place);
+                            number += 1;
                         }
                     }
                     index += 1;
                 }
             }
             None => {
-                let mut index: u8 = 0;
+                let mut number: u8 = 0;
                 for place in &self.places {
                     if enumerate {
-                        println!("{}", place);
+                        println!("{}\t{}", number, place);
+                        number += 1;
                     } else {
-                        println!("{}\t{}", index, place);
+                        println!("{}", place);
+                        number += 1;
                     }
-                    index += 1;
                 }
             }
         }
@@ -144,9 +148,9 @@ fn arg_parser(args: Vec<String>, finder: Finder) {
             "--number" | "-n" | "n" => {
                 if args.len() >= 3 {
                     let loc = finder.find_locations(args[2].to_string());
-                    finder.list(Some(loc), false);
+                    finder.list(Some(loc), true);
                 } else {
-                    finder.list(None, false);
+                    finder.list(None, true);
                 }
             }
             _ => process::exit(0),
