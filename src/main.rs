@@ -1,7 +1,7 @@
 use std::env;
 use std::path::Path;
 use std::process;
-use std::process::{Command, Stdio};
+use std::process::Command;
 
 trait PathFinder {
     fn split_path(&mut self);
@@ -90,6 +90,7 @@ fn usage() {
         v, --version    Display the version and exit
         l, --list       List all locations in $PATH (same as find with no keyword)
         f, --find       Find locations in $PATH including search keyword
+        a, --add        Add location to the $PATH, and open a new bash prompt
         "
     );
     process::exit(0);
