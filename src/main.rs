@@ -6,12 +6,12 @@ use std::process::Command;
 trait PathFinder {
     fn split_path(&mut self);
     fn list(&self, locations: Option<Vec<u8>>, enumerate: bool);
-    fn find_locations(&self, word: String) -> Vec<u8>;
+    fn find_locations(&self, word: &str) -> Vec<u8>;
     fn spawn(&self);
-    fn add(&self, location: String);
+    fn add(&self, location: &str);
     fn purge(&self);
     fn search(&self, args: Vec<String>, enumerate: bool);
-    fn enumerate_print(&self, number: &mut i32, literal: String, enumerate: bool);
+    fn enumerate_print(&self, number: &mut i32, literal: &str, enumerate: bool);
 }
 
 struct Finder {
@@ -30,7 +30,7 @@ impl PathFinder for Finder {
         }
         self.places = vec;
     }
-    fn enumerate_print(&self, number: &mut i32, literal: String, enumerate: bool) {
+    fn enumerate_print(&self, number: &mut i32, literal: &str, enumerate: bool) {
         if enumerate {
             println!("{}\t{}", *number, literal);
             *number += 1;
@@ -46,19 +46,19 @@ impl PathFinder for Finder {
                 let mut index: u8 = 0;
                 for place in &self.places {
                     if l.contains(&index) {
-                        self.enumerate_print(&mut number, place.to_string(), enumerate);
+                        self.enumerate_print(&mut number, place, enumerate);
                     }
                     index += 1;
                 }
             }
             None => {
                 for place in &self.places {
-                    self.enumerate_print(&mut number, place.to_string(), enumerate);
+                    self.enumerate_print(&mut number, place, enumerate);
                 }
             }
         }
     }
-    fn find_locations(&self, word: String) -> Vec<u8> {
+    fn find_locations(&self, word: &str) -> Vec<u8> {
         let mut locations = Vec::<u8>::new();
         let mut index: u8 = 0;
         for place in &self.places {
@@ -79,7 +79,7 @@ impl PathFinder for Finder {
         let mut child = Command::new("sleep").arg("infinity").spawn().unwrap();
         let _result = child.wait().unwrap();
     }
-    fn add(&self, location: String) {
+    fn add(&self, location: &str) {
         println!("Adding {} to $PATH", location);
         // Checks if the file location exists
         if Path::new(&location).exists() {
@@ -100,7 +100,7 @@ impl PathFinder for Finder {
     }
     fn search(&self, args: Vec<String>, enumerate: bool) {
         let phrase = if args.len() >= 3 {
-            Some(self.find_locations(args[2].to_string()))
+            Some(self.find_locations(&args[2]))
         } else {
             None
         };
@@ -138,7 +138,7 @@ fn arg_parser(args: Vec<String>, finder: Finder) {
             "--help" | "help" | "-h" | "h" => usage(),
             "--add" | "add" | "-a" | "a" => {
                 if args.len() >= 3 {
-                    finder.add(args[2].to_owned());
+                    finder.add(&args[2]);
                 }
             }
             "--find" | "find" | "-f" | "f" => finder.search(args, false),
@@ -196,8 +196,8 @@ mod tests {
             places: Vec::new(),
         };
         finder.split_path();
-        assert_eq!(finder.find_locations("a".to_owned()), vec![1, 2]);
-        assert_eq!(finder.find_locations("y".to_owned()), vec![2, 3]);
-        assert_eq!(finder.find_locations("t".to_owned()), vec![0, 1, 3]);
+        assert_eq!(finder.find_locations("a"), vec![1, 2]);
+        assert_eq!(finder.find_locations("y"), vec![2, 3]);
+        assert_eq!(finder.find_locations("t"), vec![0, 1, 3]);
     }
 }
