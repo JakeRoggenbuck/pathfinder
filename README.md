@@ -16,5 +16,6 @@ A simple utility to view, edit, and search your $PATH
 
 # Install
 ```
-cargo install --path .
+git clone https://github.com/JakeRoggenbuck/pathfinder
+cargo install --path pathfinder
 ```
