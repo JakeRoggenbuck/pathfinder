@@ -1,5 +1,7 @@
-# pathfinder
+# Pathfinder
 A simple utility to view, edit, and search your $PATH
+
+-------
 
 ## Usage
 | Shorthand | Flag        | Description                                                |
@@ -11,3 +13,8 @@ A simple utility to view, edit, and search your $PATH
 | `a`       | `--add`     | Add location to the $PATH, and open a new bash prompt      |
 | `p`       | `--purge`   | Unsets everything in $PATH, it will be empty               |
 | `n`       | `--number`  | List locations in $PATH with numbers on side               |
+
+# Install
+```
+cargo install --path .
+```
