@@ -132,6 +132,11 @@ fn version() {
 }
 
 fn arg_parser(args: Vec<String>, finder: Finder) {
+    // Run list if nothing is passed
+    if args.len() == 1 {
+        finder.list(None, false);
+        process::exit(0)
+    }
     if args.len() >= 1 {
         match args[1].as_ref() {
             "--version" | "version" | "-v" | "v" => version(),
@@ -156,11 +161,6 @@ fn arg_parser(args: Vec<String>, finder: Finder) {
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() == 1 {
-        eprintln!("No command passed\nUse --help for more info");
-        process::exit(0);
-    }
-
     let path = env::var("PATH");
     match path {
         Ok(path) => {
@@ -169,7 +169,7 @@ fn main() {
                 places: Vec::new(),
             };
             finder.split_path();
-            arg_parser(args, finder)
+            arg_parser(args, finder);
         }
         Err(e) => eprint!("{}", e),
     }
